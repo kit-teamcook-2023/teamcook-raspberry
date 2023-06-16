@@ -26,3 +26,5 @@
 *  cv2.equalizeHist(image) : 그레이스케일 된 이미지의 대비를 조정한다.
 *  cv2.Canny(image, 50, 150) : 그레이스케일 이미지에서 윤곽선을 검출한다.
 *  cv2.threshold(image, 150, 255, cv2.THRESH_BINARY) : 이미지를 이진화한다. 그레이스케일과는 다르게 완전히 흑백화한다. 임계값을 기준으로 픽셀을 검은색(0) 또는 흰색(255)으로 설정한다.
+*  cv2.convertScaleAbs(image, alpha, beta), cv2.cvtColor(image, cv2.COLOR_BGR2HSV) : 이미지의 밝기 및 채도 조정을 한다.
+*  cv2.bitwise_not(image) : 이미지의 모든 색을 반전시킨다.
