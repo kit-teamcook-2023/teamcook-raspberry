@@ -19,6 +19,7 @@
 
 ### 사용한 cv2 전처리 기능
 * image[y:y+h, x:x+w] : 이미지의 원하는 부분의 좌표를 가져와 자른다
+* cv2.resize(image, (800, 200)) : 이미지를 원하는 크기로 재조정한다.
 * cv2.GaussianBlur(image, (x, y), 0) : 이미지의 가우시안 블러를 적용하여 이미지를 흐리게 만든다 '(x, y)'는 가우시안 커널의 크기이며 0은 x,y축 표준편차이다.
 *  cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21) : 이미지에서 노이즈를 제거한다. 10과 10은 필터링과 사전필터의 강도이며, 7은 사전 필터의 커널 크기이며, 21은 비슷한 픽셀을 찾기 위한 사전 필터 이웃의 크기이다.
 *  cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) : 이미지를 그레이스케일로 변환한다.
