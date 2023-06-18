@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import httpx
 import asyncio
 import json
-from ocr import perform_ocr
+from ocr import perform_ocr, capture_camera
 
 load_dotenv(verbose=True)
 
@@ -17,15 +17,16 @@ async def crontab():
 
         print(uid)
         print(SERVER)
-        image_path = '/home/cjw/flaskweb/images/test5.jpg'
-        region_of_interest = (115, 74, 331, 120)
+        image_path = '/home/cjw/flaskweb/images/gasimage.jpg'
+        region_of_interest = (40, 346, 603, 96)
 
         ocr_data = perform_ocr(image_path, region_of_interest)
 
         async with httpx.AsyncClient() as client:
             data = {
-                'ocr_data': "123456"
+                'ocr_data': ocr_data
             }
+            print(data)
             json_data = json.dumps(data)
             response = await client.post(SERVER + '/gas-meter/' + uid, content=json_data)
 
