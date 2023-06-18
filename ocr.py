@@ -16,56 +16,82 @@ def perform_ocr(image_path, region):
     cropped_image = image[y:y+h, x:x+w]
     #resized_image = cv2.resize(cropped_image, (800, 200))
     
-    # 이미지에 가우시안 블러 적용
-    gausian_image = cv2.GaussianBlur(cropped_image, (5, 5), 0)
+    # 밝기 조정
+    #bright = 50
+    #adjusted_image = cv2.convertScaleAbs(cropped_image, alpha=1.0, beta=bright)
+
+    # 채도 조정
+    #saturation = 1.5
+    #hsv_image = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2HSV)
+    #hsv_image[..., 1] = hsv_image[..., 1] * saturation
+    #saturated_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
     
-    # 이미지에 노이즈 제거
+    # 이미지 반전
+    inverted_image = cv2.bitwise_not(cropped_image)
+    
+    # 가우시안 블러 적용
+    gausian_image = cv2.GaussianBlur(inverted_image, (5, 5), 0)
+    
+    # 노이즈 제거
     denoised_image = cv2.fastNlMeansDenoisingColored(gausian_image, None, 10, 10, 7, 21)
     
-    # 이미지를 그레이스케일로 변환
-    #gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
+    # 그레이스케일로 변환
+    #gray_image = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2GRAY)
     
-    # 이미지 대비 조정
-    #equalized_image = cv2.equalizeHist(gray)
+    # 대비 조정
+    #equalized_image = cv2.equalizeHist(gray_image)
 
-    # 이미지에 윤곽선 검출 적용
-    #edges = cv2.Canny(gray, 50, 150)
+    # 곽선 검출 적용
+    #edges_image = cv2.Canny(equalized_image, 50, 150)
     
-    # 이미지 이진화
+    # 이진화
     #_, binary_image = cv2.threshold(resized_image, 150, 255, cv2.THRESH_BINARY)
     
-    # 이미지에서 텍스트 추출
+    # 텍스트 추출
     text = pytesseract.image_to_string(denoised_image, config='--psm 6')
     
     # 추출된 텍스트 정제
     cleaned_text = re.sub(r'\D', '', text)
     
     # 추출된 텍스트가 비어 있는지 확인
-    #if cleaned_text == '':
-        #return ocr_data
+    if cleaned_text == '':
+        return ocr_data
         
     cv2.imshow('ex',denoised_image)
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
-    # 추출된 텍스트를 JSON 형식으로 변환
+    
     ocr_data = {
         'gas': int(cleaned_text)
     }
     
-    # JSON 데이터 반환
     return ocr_data
 
-# 이미지 파일 경로
-image_path = '/home/cjw/flaskweb/images/test7.jpg'
+def capture_camera():
+    camera = cv2.VideoCapture(0)
+    
+    ret, frame = camera.read()
+    
+    camera.release()
+    
+    return frame
 
-# 특정 영역 좌표 (x1, y1, x2, y2)
-region_of_interest = (184, 275, 231, 45)
+if __name__ == "__main__":
+    #camera = cv2.VideoCapture(0)
+    #ret, frame = camera.read()
 
-extracted_data = perform_ocr(image_path, region_of_interest)
+    #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+    #cv2.imwrite(image_path, frame)
 
-# 추출된 데이터가 있을 경우에만 JSON 형식으로 출력
-if extracted_data is not None:
-    ocr_data = json.dumps(extracted_data)
-    print(ocr_data)
-else:
-    print("No text found in the image.")
+    image_path = '/home/cjw/flaskweb/images/gasimage.jpg'
+
+    # 특정 영역 좌표 (x1, y1, x2, y2)
+    region_of_interest = (40, 346, 603, 96)
+
+    extracted_data = perform_ocr(image_path, region_of_interest)
+
+    if extracted_data is not None:
+        ocr_data = json.dumps(extracted_data)
+        print(ocr_data)
+    else:
+        print("No text found in the image.")
