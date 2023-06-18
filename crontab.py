@@ -17,6 +17,11 @@ async def crontab():
 
         print(uid)
         print(SERVER)
+        #camera = cv2.VideoCapture(0)
+        #ret, frame = camera.read()
+
+        #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+        #cv2.imwrite(image_path, frame)
         image_path = '/home/cjw/flaskweb/images/gasimage.jpg'
         region_of_interest = (40, 346, 603, 96)
 
