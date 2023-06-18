@@ -12,6 +12,11 @@ app = Flask(__name__)
 
 @app.route("/ocr", methods=["GET"])
 def get_ocr_data():
+    #camera = cv2.VideoCapture(0)
+    #ret, frame = camera.read()
+
+    #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+    #cv2.imwrite(image_path, frame)
     image_path = '/home/cjw/flaskweb/images/test5.jpg'
     region_of_interest = (115, 74, 331, 120)
 
