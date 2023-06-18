@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import json
 import os
 from dotenv import load_dotenv
-from ocr import perform_ocr
+from ocr import perform_ocr, capture_camera
 
 load_dotenv(verbose=True)
 
