@@ -11,29 +11,29 @@ def perform_ocr(image_path, region):
     }
     image = cv2.imread(image_path)
     
-    # 특정 영역 추출
+    #특정 영역 추출
     x, y, w, h = region
-    cropped_image = image[y:y+h, x:x+w]
+    image = image[y:y+h, x:x+w]
     #resized_image = cv2.resize(cropped_image, (800, 200))
     
+    # 이미지 반전
+    image = cv2.bitwise_not(image)
+    
     # 밝기 조정
-    #bright = 50
-    #adjusted_image = cv2.convertScaleAbs(cropped_image, alpha=1.0, beta=bright)
+    bright = 70
+    image = cv2.convertScaleAbs(image, alpha=1.0, beta=bright)
 
     # 채도 조정
-    #saturation = 1.5
-    #hsv_image = cv2.cvtColor(adjusted_image, cv2.COLOR_BGR2HSV)
-    #hsv_image[..., 1] = hsv_image[..., 1] * saturation
-    #saturated_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
-    
-    # 이미지 반전
-    inverted_image = cv2.bitwise_not(cropped_image)
+    saturation = 10.0
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    image[..., 1] = image[..., 1] * saturation
+    image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
     
     # 가우시안 블러 적용
-    gausian_image = cv2.GaussianBlur(inverted_image, (5, 5), 0)
+    image = cv2.GaussianBlur(image, (5, 5), 0)
     
     # 노이즈 제거
-    denoised_image = cv2.fastNlMeansDenoisingColored(gausian_image, None, 10, 10, 7, 21)
+    image = cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21)
     
     # 그레이스케일로 변환
     #gray_image = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2GRAY)
@@ -42,13 +42,13 @@ def perform_ocr(image_path, region):
     #equalized_image = cv2.equalizeHist(gray_image)
 
     # 곽선 검출 적용
-    #edges_image = cv2.Canny(equalized_image, 50, 150)
+    #edges_image = cv2.Canny(denoised_image, 50, 150)
     
     # 이진화
-    #_, binary_image = cv2.threshold(resized_image, 150, 255, cv2.THRESH_BINARY)
+    #_, binary_image = cv2.threshold(denoised_image, 150, 255, cv2.THRESH_BINARY)
     
     # 텍스트 추출
-    text = pytesseract.image_to_string(denoised_image, config='--psm 6')
+    text = pytesseract.image_to_string(image, config='--psm 6')
     
     # 추출된 텍스트 정제
     cleaned_text = re.sub(r'\D', '', text)
@@ -57,7 +57,7 @@ def perform_ocr(image_path, region):
     if cleaned_text == '':
         return ocr_data
         
-    cv2.imshow('ex',denoised_image)
+    cv2.imshow('ex',image)
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
     
@@ -83,10 +83,10 @@ if __name__ == "__main__":
     #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
     #cv2.imwrite(image_path, frame)
 
-    image_path = '/home/cjw/flaskweb/images/gasimage.jpg'
+    image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
 
     # 특정 영역 좌표 (x1, y1, x2, y2)
-    region_of_interest = (40, 346, 603, 96)
+    region_of_interest = (61, 675, 572, 79)
 
     extracted_data = perform_ocr(image_path, region_of_interest)
 
