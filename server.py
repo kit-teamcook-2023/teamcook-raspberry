@@ -17,8 +17,8 @@ def get_ocr_data():
 
     #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
     #cv2.imwrite(image_path, frame)
-    image_path = '/home/cjw/flaskweb/images/test5.jpg'
-    region_of_interest = (115, 74, 331, 120)
+    image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+    region_of_interest = (61, 675, 572, 79)
 
     ocr_data = perform_ocr(image_path, region_of_interest)
 
