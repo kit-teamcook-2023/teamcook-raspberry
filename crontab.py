@@ -22,17 +22,14 @@ async def crontab():
 
         #image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
         #cv2.imwrite(image_path, frame)
-        image_path = '/home/cjw/flaskweb/images/gasimage.jpg'
-        region_of_interest = (40, 346, 603, 96)
+        image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+        region_of_interest = (61, 675, 572, 79)
 
         ocr_data = perform_ocr(image_path, region_of_interest)
 
         async with httpx.AsyncClient() as client:
-            data = {
-                'ocr_data': ocr_data
-            }
-            print(data)
-            json_data = json.dumps(data)
+            print(ocr_data)
+            json_data = json.dumps(ocr_data)
             response = await client.post(SERVER + '/gas-meter/' + uid, content=json_data)
 
 async def schedule_job():
