@@ -3,52 +3,75 @@ import pytesseract
 import json
 import re
 
+x1, y1, x2, y2 = 0, 0, 0, 0
+roi = None
+image = None
+
+#관심영역지정
+def mouse_callback(event, x, y, flags, param):
+    global x1, y1, x2, y2, roi, image
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        if x1 == 0 and y1 == 0:
+            x1, y1 = x, y
+        else:
+            x2, y2 = x, y
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.imshow("Image", image)
+
+            x = min(x1, x2)
+            y = min(y1, y2)
+            w = abs(x2 - x1)
+            h = abs(y2 - y1)
+
+            roi = (x, y, w, h)
+
 #상황에 따라 알맞은 필터 적용
 
 def perform_ocr(image_path, region):
     ocr_data = {
         'gas' : 0
     }
-    image = cv2.imread(image_path)
+    img = cv2.imread(image_path)
     
     #특정 영역 추출
     x, y, w, h = region
-    image = image[y:y+h, x:x+w]
-    #resized_image = cv2.resize(cropped_image, (800, 200))
+    img = img[y:y+h, x:x+w]
+    #img = cv2.resize(img, (800, 200))
     
     # 이미지 반전
-    image = cv2.bitwise_not(image)
+    img = cv2.bitwise_not(img)
     
     # 밝기 조정
     bright = 70
-    image = cv2.convertScaleAbs(image, alpha=1.0, beta=bright)
+    img = cv2.convertScaleAbs(img, alpha=1.0, beta=bright)
 
     # 채도 조정
     saturation = 10.0
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    image[..., 1] = image[..., 1] * saturation
-    image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    img[..., 1] = img[..., 1] * saturation
+    img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
     
     # 가우시안 블러 적용
-    image = cv2.GaussianBlur(image, (5, 5), 0)
+    img = cv2.GaussianBlur(img, (5, 5), 0)
     
     # 노이즈 제거
-    image = cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 21)
+    img = cv2.fastNlMeansDenoisingColored(img, None, 10, 10, 7, 21)
     
     # 그레이스케일로 변환
-    #gray_image = cv2.cvtColor(denoised_image, cv2.COLOR_BGR2GRAY)
+    #img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
     # 대비 조정
-    #equalized_image = cv2.equalizeHist(gray_image)
+    #img = cv2.equalizeHist(img)
 
     # 곽선 검출 적용
-    #edges_image = cv2.Canny(denoised_image, 50, 150)
+    #img = cv2.Canny(img, 50, 150)
     
     # 이진화
-    #_, binary_image = cv2.threshold(denoised_image, 150, 255, cv2.THRESH_BINARY)
+    #_, img = cv2.threshold(img, 150, 255, cv2.THRESH_BINARY)
     
     # 텍스트 추출
-    text = pytesseract.image_to_string(image, config='--psm 6')
+    text = pytesseract.image_to_string(img, config='--psm 6')
     
     # 추출된 텍스트 정제
     cleaned_text = re.sub(r'\D', '', text)
@@ -57,7 +80,7 @@ def perform_ocr(image_path, region):
     if cleaned_text == '':
         return ocr_data
         
-    cv2.imshow('ex',image)
+    cv2.imshow('ex',img)
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
     
@@ -84,9 +107,23 @@ if __name__ == "__main__":
     #cv2.imwrite(image_path, frame)
 
     image_path = '/home/cjw/flaskweb/images/gasimage2.jpg'
+    
+    image = cv2.imread(image_path)
+    cv2.namedWindow("Image")
 
-    # 특정 영역 좌표 (x1, y1, x2, y2)
-    region_of_interest = (61, 675, 572, 79)
+    cv2.setMouseCallback("Image", mouse_callback)
+
+    cv2.imshow("Image", image)
+
+    while True:
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q') or key == 27 or roi is not None:
+            break
+
+    cv2.destroyAllWindows()
+    print(roi)
+
+    region_of_interest = roi
 
     extracted_data = perform_ocr(image_path, region_of_interest)
 
