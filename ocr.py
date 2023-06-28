@@ -89,18 +89,10 @@ def perform_ocr(image_path, region):
     #KOR_text = re.sub(r'[^ㄱ-ㅎㅏ-ㅣ가-힣]', '', text)
     
     # 영어 문자만 필터링
-    #ENG_text = re.sub(r'[^a-zA-Z]', '', text)
-    
-    # 숫자만 필터링
-    #cleaned_text = re.sub(r'\D', '', text)
-    
-    # 영어와 숫자만 필터링
-    cleaned_text = re.sub(r'\D', '', text)
     ENG_text = re.sub(r'[^a-zA-Z]', '', text)
     
-    # 추출된 텍스트가 비어 있는지 확인
-    if cleaned_text == '':
-        return ocr_data
+    # 숫자만 필터링
+    cleaned_text = re.sub(r'\D', '', text)
     
     #추출(숫자만)
     #ocr_data = {
@@ -109,13 +101,13 @@ def perform_ocr(image_path, region):
     
     #추출(문자만)
     #ocr_data = {
-    #    'gas': cleaned_text.strip()
+    #    'english': ENG_text
     #}
     
     #추출(문자, 숫자)
     ocr_data = {
-        'english': ENG_text,
-        'num': int(cleaned_text)
+        'num': int(cleaned_text),
+        'english': ENG_text
     }
     
     return ocr_data
